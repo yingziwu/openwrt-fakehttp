@@ -15,8 +15,8 @@ PKG_SOURCE_SUBDIR:=$(PKG_UPSTREAM_NAME)-$(PKG_UPSTREAM_VERSION)
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_SOURCE_SUBDIR)
 
 ifeq ($(PKG_UPSTREAM_GITHASH),)
-PKG_SOURCE_URL:=https://codeload.github.com/MikeWang000000/FakeHTTP/tar.gz/refs/tags/v$(PKG_UPSTREAM_VERSION)?
-PKG_HASH:=skip
+PKG_SOURCE_URL:=https://codeload.github.com/MikeWang000000/FakeHTTP/tar.gz/refs/tags/$(PKG_UPSTREAM_VERSION)?
+PKG_HASH:=c95c4d46e122390b0dcfd8509c708a6fc6817fb3e325cb966bf81a62bae973be
 
 PKG_SOURCE:=$(PKG_SOURCE_SUBDIR).tar.gz
 else
@@ -41,7 +41,7 @@ define Package/fakehttp
 	CATEGORY:=Network
 	TITLE:=Obfuscate all your TCP connections into HTTP protocol
 	URL:=https://github.com/MikeWang000000/FakeHTTP
-	DEPENDS:=+libmnl +libnfnetlink +libnetfilter_queue +kmod-nft-queue +nftables
+	DEPENDS:=+libmnl +libnfnetlink +libnetfilter-queue +kmod-nft-queue +nftables
 endef
 
 define Package/fakehttp/install
