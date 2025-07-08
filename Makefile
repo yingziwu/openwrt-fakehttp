@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Copyright (C) 2024-2025 Yuxi Yang <i@bgme.me>
+
+include $(TOPDIR)/rules.mk
+
+PKG_NAME:=fakehttp
+PKG_UPSTREAM_NAME:=FakeHTTP
+PKG_UPSTREAM_VERSION:=0.9.18
+PKG_UPSTREAM_GITHASH:=
+PKG_VERSION:=$(PKG_UPSTREAM_VERSION)$(if $(PKG_UPSTREAM_GITHASH),~$(call version_abbrev,$(PKG_UPSTREAM_GITHASH)))
+PKG_RELEASE:=1
+
+PKG_SOURCE_SUBDIR:=$(PKG_UPSTREAM_NAME)-$(PKG_UPSTREAM_VERSION)
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_SOURCE_SUBDIR)
+
+ifeq ($(PKG_UPSTREAM_GITHASH),)
+PKG_SOURCE_URL:=https://codeload.github.com/MikeWang000000/FakeHTTP/tar.gz/refs/tags/v$(PKG_UPSTREAM_VERSION)?
+PKG_HASH:=skip
+
+PKG_SOURCE:=$(PKG_SOURCE_SUBDIR).tar.gz
+else
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_URL:=https://github.com/MikeWang000000/FakeHTTP.git
+PKG_SOURCE_VERSION:=$(PKG_UPSTREAM_GITHASH)
+PKG_MIRROR_HASH:=skip
+
+PKG_SOURCE:=$(PKG_SOURCE_SUBDIR)-$(PKG_SOURCE_VERSION).tar.gz
+endif
+
+PKG_MAINTAINER:=Yuxi Yang <i@bgme.me>
+PKG_LICENSE:=GPL-3.0-or-later
+PKG_LICENSE_FILES:=LICENSE
+
+PKG_BUILD_PARALLEL:=1
+
+include $(INCLUDE_DIR)/package.mk
+
+define Package/fakehttp
+	SECTION:=net
+	CATEGORY:=Network
+	TITLE:=Obfuscate all your TCP connections into HTTP protocol
+	URL:=https://github.com/MikeWang000000/FakeHTTP
+	DEPENDS:=+libmnl +libnfnetlink +libnetfilter_queue +kmod-nft-queue +nftables
+endef
+
+define Package/fakehttp/install
+	$(INSTALL_DIR) $(1)/usr/sbin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/build/fakehttp $(1)/usr/sbin/fakehttp
+endef
+
+$(eval $(call BuildPackage,$(PKG_NAME)))
