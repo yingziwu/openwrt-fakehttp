@@ -9,7 +9,7 @@ PKG_UPSTREAM_NAME:=FakeHTTP
 PKG_UPSTREAM_VERSION:=0.9.18
 PKG_UPSTREAM_GITHASH:=
 PKG_VERSION:=$(PKG_UPSTREAM_VERSION)$(if $(PKG_UPSTREAM_GITHASH),~$(call version_abbrev,$(PKG_UPSTREAM_GITHASH)))
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_SOURCE_SUBDIR:=$(PKG_UPSTREAM_NAME)-$(PKG_UPSTREAM_VERSION)
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_SOURCE_SUBDIR)
@@ -36,7 +36,7 @@ PKG_BUILD_PARALLEL:=1
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/fakehttp
+define Package/$(PKG_NAME)
 	SECTION:=net
 	CATEGORY:=Network
 	TITLE:=Obfuscate all your TCP connections into HTTP protocol
@@ -44,9 +44,19 @@ define Package/fakehttp
 	DEPENDS:=+libmnl +libnfnetlink +libnetfilter-queue +kmod-nft-queue +nftables
 endef
 
-define Package/fakehttp/install
+define Package/$(PKG_NAME)/conffiles
+/etc/config/fakehttp
+endef
+
+define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/build/fakehttp $(1)/usr/sbin/fakehttp
+
+	$(INSTALL_DIR) $(1)/etc/init.d/
+	$(INSTALL_BIN) $(CURDIR)/files/fakehttp.init $(1)/etc/init.d/fakehttp
+
+	$(INSTALL_DIR) $(1)/etc/config/
+	$(INSTALL_CONF) $(CURDIR)/files/fakehttp.config $(1)/etc/config/fakehttp
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
