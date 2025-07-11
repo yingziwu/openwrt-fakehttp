@@ -39,7 +39,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/$(PKG_NAME)
 	SECTION:=net
 	CATEGORY:=Network
-	TITLE:=Obfuscate all your TCP connections into HTTP protocol
+	TITLE:=Obfuscate all your TCP connections into HTTP protocol.
 	URL:=https://github.com/MikeWang000000/FakeHTTP
 	DEPENDS:=+libmnl +libnfnetlink +libnetfilter-queue +kmod-nft-queue +nftables
 endef

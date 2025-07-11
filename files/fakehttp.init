@@ -43,28 +43,36 @@ add_payload() {
     esac
 }
 
-add_advanced() {
-    local skip disable_estimation pct fwmark_bypassing fwmark_handle \
-    queue_number repeat ttl use_iptables
-    config_get_bool skip "advanced" "skip" "0"
-    config_get_bool disable_estimation "advanced" "disable_estimation" "0"
-    config_get pct "advanced" "pct" "-1"
-    config_get fwmark_bypassing "advanced" "fwmark_bypassing" "-1"
-    config_get fwmark_handle "advanced" "fwmark_handle" "-1"
-    config_get queue_number "advanced" "queue_number" "-1"
-    config_get repeat "advanced" "repeat" "-1"
-    config_get ttl "advanced" "ttl" "-1"
-    config_get_bool use_iptables "advanced" "use_iptables" "0"
+test_bool_then_append() {
+    local section="$1"
+    local config_option="$2"
+    local command_option="$3"
 
-    [ "${skip}" -eq "1" ] && procd_append_param command "-f"
-    [ "${disable_estimation}" -eq "1" ] && procd_append_param command "-g"
-    [ "${pct}" -ne "-1" ] && procd_append_param command "-y" "${pct}"
-    [ "${fwmark_bypassing}" -ne "-1" ] && procd_append_param command "-m" "${fwmark_bypassing}"
-    [ "${fwmark_handle}" -ne "-1" ] && procd_append_param command "-x" "${fwmark_handle}"
-    [ "${queue_number}" -ne "-1" ] && procd_append_param command "-n" "${queue_number}"
-    [ "${repeat}" -ne "-1" ] && procd_append_param command "-r" "${repeat}"
-    [ "${ttl}" -ne "-1" ] && procd_append_param command "-t" "${ttl}"
-    [ "${use_iptables}" -eq "1" ] && procd_append_param command "-z"
+    local tmp
+    config_get_bool tmp "${section}" "${config_option}" "0"
+    [ "${tmp}" -eq "1" ] && procd_append_param command "${command_option}"
+}
+
+test_number_then_append() {
+    local section="$1"
+    local config_option="$2"
+    local command_option="$3"
+
+    local tmp
+    config_get tmp "${section}" "${config_option}" "-1"
+    [ "${tmp}" -gt "0" ] && procd_append_param command "${command_option}" "${tmp}"
+}
+
+add_advanced() {
+    test_bool_then_append "advanced" "skip" "-f"
+    test_bool_then_append "advanced" "disable_estimation" "-g"
+    test_number_then_append "advanced" "pct" "-y"
+    test_number_then_append "advanced" "fwmark_bypassing" "-m"
+    test_number_then_append "advanced" "fwmark_handle" "-x"
+    test_number_then_append "advanced" "queue_number" "-n"
+    test_number_then_append "advanced" "repeat" "-r"
+    test_number_then_append "advanced" "ttl" "-t"
+    test_bool_then_append "advanced" "use_iptables" "-z"
 }
 
 fakehttp_instance() {
@@ -77,13 +85,8 @@ fakehttp_instance() {
     procd_open_instance
     procd_set_param command "${PROG}"
     config_list_foreach "globals" "interface" add_interface
-
-    local silent
-    config_get silent "globals" "silent" "0"
-    [ "${silent}" -eq "1" ] && procd_append_param command "-s"
-
+    test_bool_then_append "globals" "silent" "-s"    
     config_foreach add_payload "payload"
-
     add_advanced
 
 	procd_set_param stdout 1
