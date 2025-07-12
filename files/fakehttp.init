@@ -30,13 +30,13 @@ add_payload() {
         config_get type "${section}" "type" ""
         config_get payload "${section}" "payload" ""
         case "${type}" in
-            "h")
+            "http")
                 procd_append_param command "-h" "${payload}"
                 ;;
-            "e")
+            "https")
                 procd_append_param command "-e" "${payload}"
                 ;;
-            "b")
+            "binary")
                 procd_append_param command "-b" "${payload}"
                 ;;
         esac
