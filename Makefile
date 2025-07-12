@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Copyright (C) 2024-2025 Yuxi Yang <i@bgme.me>
+# Copyright (C) 2025 Yuxi Yang <i@bgme.me>
 
 include $(TOPDIR)/rules.mk
 
@@ -9,7 +9,7 @@ PKG_UPSTREAM_NAME:=FakeHTTP
 PKG_UPSTREAM_VERSION:=0.9.18
 PKG_UPSTREAM_GITHASH:=
 PKG_VERSION:=$(PKG_UPSTREAM_VERSION)$(if $(PKG_UPSTREAM_GITHASH),~$(call version_abbrev,$(PKG_UPSTREAM_GITHASH)))
-PKG_RELEASE:=2
+PKG_RELEASE:=3
 
 PKG_SOURCE_SUBDIR:=$(PKG_UPSTREAM_NAME)-$(PKG_UPSTREAM_VERSION)
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_SOURCE_SUBDIR)
@@ -57,6 +57,9 @@ define Package/$(PKG_NAME)/install
 
 	$(INSTALL_DIR) $(1)/etc/config/
 	$(INSTALL_CONF) $(CURDIR)/files/fakehttp.config $(1)/etc/config/fakehttp
+
+	$(INSTALL_DIR) $(1)/etc/fakehttp/
+	$(INSTALL_CONF) $(CURDIR)/files/fakehtttp.payload $(1)/etc/fakehttp/example_payload
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))

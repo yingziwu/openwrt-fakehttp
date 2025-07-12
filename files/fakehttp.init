@@ -21,26 +21,26 @@ add_interface() {
 add_payload() {
     local section="$1"
 
-    local type
-    config_get type "${section}" "type" ""
+    local enabled
+    config_get_bool enabled "${section}" "enabled" "0"
 
-    case "${type}" in
-        "h")
-            local hostname
-            config_get hostname "${section}" "hostname" ""
-            procd_append_param command "-h" "${hostname}"
-            ;;
-        "e")
-            local hostname
-            config_get hostname "${section}" "hostname" ""
-            procd_append_param command "-e" "${hostname}"
-            ;;
-        "b")
-            local file
-            config_get file "${section}" "file" ""
-            procd_append_param command "-b" "${file}"
-            ;;
-    esac
+    if [ "${enabled}" -eq "1"  ]
+    then
+        local type payload
+        config_get type "${section}" "type" ""
+        config_get payload "${section}" "payload" ""
+        case "${type}" in
+            "h")
+                procd_append_param command "-h" "${payload}"
+                ;;
+            "e")
+                procd_append_param command "-e" "${payload}"
+                ;;
+            "b")
+                procd_append_param command "-b" "${payload}"
+                ;;
+        esac
+    fi
 }
 
 test_bool_then_append() {
